@@ -9,5 +9,11 @@ const getUsers = async (req: Request, res: Response) => {
 
   return res.status(200).json(fields);
 };
+const getUser = async (req: Request, res: Response) => {
+  const data = await pool.query(`SELECT * FROM users WHERE name = 'email'`);
+  const { fields } = data;
+  console.log(fields);
+  return res.status(200).json(fields[0]);
+};
 
-export { getUsers };
+export { getUsers, getUser };
