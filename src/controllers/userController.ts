@@ -5,9 +5,9 @@ import dotenv from 'dotenv';
 import pool from '../db/index';
 const getUsers = async (req: Request, res: Response) => {
   const data = await pool.query('SELECT * FROM users');
-  const { fields } = data;
+  const { rows } = data;
 
-  return res.status(200).json(fields);
+  return res.status(200).json(rows);
 };
 const getUser = async (req: Request, res: Response) => {
   const data = await pool.query(`SELECT * FROM users WHERE name = 'email'`);
@@ -16,4 +16,28 @@ const getUser = async (req: Request, res: Response) => {
   return res.status(200).json(fields[0]);
 };
 
-export { getUsers, getUser };
+const signupUser = async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+  console.log(username, password);
+  try {
+    if (username && password) {
+      await pool.query(
+        `INSERT INTO users (fname,password) VALUES ('${username}', '${password}')`
+      );
+      return res.status(200).json({
+        message: 'successfully logged In',
+      });
+    } else {
+      return res.status(500).json({
+        message: 'Error Occured',
+      });
+    }
+  } catch (e) {
+    return res.status(500).json({
+      message: 'Error Occured',
+      error: e,
+    });
+  }
+};
+
+export { getUsers, getUser, signupUser };

@@ -1,7 +1,9 @@
--- CREATE DATABASE TASKFLOW;
+CREATE DATABASE TASKFLOW;
 
 
--- CREATE TABLE USERS(
---     user_id int NOT NULL  PRIMARY KEY,
---     name INT NOT NULL 
--- )
+CREATE TABLE USERS(
+   user_id SERIAL PRIMARY KEY,
+    fname INT,
+    password VARCHAR ,
+
+)
