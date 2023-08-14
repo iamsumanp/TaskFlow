@@ -20,6 +20,7 @@ const signupUser = async (req: Request, res: Response) => {
   const { username, password } = req.body;
   console.log(username, password);
   try {
+    //fix logic here
     if (username && password) {
       await pool.query(
         `INSERT INTO users (fname,password) VALUES ('${username}', '${password}')`
