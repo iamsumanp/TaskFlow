@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import dotenv from 'dotenv';
-// dotenv.config();
 
 import pool from '../db/index';
 const getUsers = async (req: Request, res: Response) => {
