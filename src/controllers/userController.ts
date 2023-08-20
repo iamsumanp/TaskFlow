@@ -1,21 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-
+import bcrypt from 'bcrypt';
 dotenv.config();
 
 import pool from '../db/index';
-import { authenticateUser } from '../middleware/authJwt';
-const getUsers = async (req: Request, res: Response) => {
+
+const getAllUsers = async (req: Request, res: Response) => {
   const data = await pool.query('SELECT * FROM users');
   const { rows } = data;
 
   return res.status(200).json(rows);
 };
 const getUser = async (req: Request, res: Response) => {
-  // const { user_id } = req.body.params;
-  // const data = await pool.query(`SELECT * FROM users WHERE id = $1`, user_id);
-  // const { fields } = data;
   try {
     const { id } = req.params;
 
@@ -44,18 +41,9 @@ const getUser = async (req: Request, res: Response) => {
   // return res.status(200).json(fields[0]);
 };
 
-const getAllUsers = async (req: Request, res: Response) => {
-  const data = await pool.query('SELECT * FROM USERS');
-
-  if (data) {
-    res.status(200).json({
-      users: data.rows,
-    });
-  }
-};
-
 const signupUser = async (req: Request, res: Response) => {
   const { username, password } = req.body;
+
   try {
     //fix logic here
     if (username && password) {
@@ -70,15 +58,27 @@ const signupUser = async (req: Request, res: Response) => {
         });
       }
 
+      const saltRound = 10;
+      const hashedPassword = await bcrypt
+        .hash(password, saltRound)
+        .then((hash) => hash);
+
       //TODO hash the password before deploying the the database maybe with bcrypt
       //TODO set cookie with
 
       await pool.query(`INSERT INTO users (fname,password) VALUES ($1, $2)`, [
         username,
-        password,
+        hashedPassword,
       ]);
+
+      const user = await pool.query('SELECT * FROM users WHERE fname = $1', [
+        username,
+      ]);
+      const { rows } = user;
+
       return res.status(200).json({
-        message: 'successfully logged In', //return cookie and set header i guess
+        message: 'successfully Signed up', //return cookie and set header i guess
+        user: rows[0],
       });
     } else {
       return res.status(500).json({
@@ -111,9 +111,17 @@ const loginUser = async (req: Request, res: Response) => {
       const token = jwt.sign(user.rows[0].user_id, secret); //? add expiresTime
       //? maybe set cookiw with the token as well instead of using the authorization headers
 
+      const { rows } = user;
+      const hashPassword = rows[0].password;
+      const verifyPassword = await bcrypt.compare(password, hashPassword);
+
+      if (!verifyPassword)
+        return res.status(401).json({ message: 'Invalid credentials' });
+
       res.status(200).json({
         message: 'successfully logged in', //set cookie and set header i guess
         token,
+        user: rows[0],
       });
     } else {
       res.status(500).json({
