@@ -16,8 +16,9 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
   const data = await pool.query(`SELECT * FROM users WHERE fname = 'email'`);
   const { fields } = data;
   // console.log(fields);
-  authenticateUser(req, res, next);
-  // return res.status(200).json(fields[0]);
+  // authenticateUser(req, res, next);
+  console.log('tset the get user');
+  return res.status(200).json(fields[0]);
 };
 
 const signupUser = async (req: Request, res: Response) => {

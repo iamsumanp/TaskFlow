@@ -5,12 +5,13 @@ import {
   loginUser,
   signupUser,
 } from '../controllers/userController';
+import { authenticateUser } from '../middleware/authJwt';
 
 var router = express.Router();
 
-router.route('/all').get(getUsers);
+router.route('/all').get(authenticateUser, getUsers);
 
-router.route('/user').get(getUser);
+router.route('/user').get(authenticateUser, getUser);
 
 router.route('/signup').post(signupUser);
 
