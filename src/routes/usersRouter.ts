@@ -1,7 +1,7 @@
 import express from 'express';
 import {
   getUser,
-  getUsers,
+  getAllUsers,
   loginUser,
   signupUser,
 } from '../controllers/userController';
@@ -9,9 +9,9 @@ import { authenticateUser } from '../middleware/authJwt';
 
 var router = express.Router();
 
-router.route('/all').get(authenticateUser, getUsers);
+router.route('/all').get(authenticateUser, getAllUsers);
 
-router.route('/user').get(authenticateUser, getUser);
+router.route('/user/:id').get(authenticateUser, getUser);
 
 router.route('/signup').post(signupUser);
 
